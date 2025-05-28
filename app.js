@@ -1,6 +1,6 @@
-import express from "express";
-
+import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
 
 const servidor = express();
 
@@ -9,6 +9,12 @@ servidor.use(cors());
 
 //Permite usar parâmetros de corpo na minha aplição
 servidor.use(express.json());
+
+//Variavel que  aponta para onde os arquivos que foram recebidos vão ser armazenados
+let uploadPerfil = multer({ dest: './storage/perfil' })
+//Usado para liberar a pasta storage/perfil para carregar a foto na Web
+servidor.use('/storage/perfil', express.static('./storage/perfil'))
+servidor.use('/storage/album', express.static('./storage/album'))
 
 //Porta da API
 servidor.listen(
@@ -303,3 +309,17 @@ servidor.post('/loja/pedido/completo', (req, resp) => {
         })
     }
 })
+
+//Configuração do multer para receber um arquivo ou uma foto
+servidor.post('/perfil/capa', uploadPerfil.single('imagem'), (req, resp) => {
+    let caminho = req.file.path;
+    let extensao = req.file.mimetype;
+    let nome = req.file.originalname;
+
+    resp.send({
+        caminho: caminho,
+        extensao: extensao,
+        nome: nome
+    })
+})
+
