@@ -1,5 +1,6 @@
 import { calcularTotal } from "../service/loja/PedidoCompletoService.js";
 import { calcularValorParcelas } from "../service/loja/PedidoCompletoService.js";
+import { ValidarPedidoCompleto } from "../validation/loja/pedidoCompletoValidation.js";
 
 import { Router } from "express";
 
@@ -44,8 +45,7 @@ endepoints.post('/loja/pedido', (req, resp) => {
 
 endepoints.post('/loja/pedido/completo', (req, resp) => {
     try {
-        if (!req.body.parcelas || isNaN(req.body.parcelas)) throw new Error('O parâmetro parcela está inválido');
-        if (!req.body.itens) throw new Error('O parâmetro itens está invállido');
+        ValidarPedidoCompleto(req);
 
         let parcelas = req.body.parcelas;
         let itens = req.body.itens;
