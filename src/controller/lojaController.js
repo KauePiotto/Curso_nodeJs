@@ -1,0 +1,80 @@
+import { Router } from "express";
+
+const endepoints = Router();
+
+//Usando parâmetro combinado 
+endepoints.post('/loja/pedido', (req, resp) => {
+    try {
+        if (!req.body.parcelas || isNaN(req.body.parcelas)) throw new Error('O parâmetro parcela está inválido.');
+
+        let total = req.body.total;
+        let parcelas = req.body.parcelas;
+        let cupom = req.query.cupom;
+
+        if (parcelas > 1) {
+            let juros = total * 0.05;
+            total += juros;
+        }
+
+        if (cupom == 'QUERO100') {
+            total -= 100;
+        } else {
+            if (!req.query.cupom) throw new Error('O cupom está inválido.')
+        }
+
+
+        let valorParcela = total / parcelas;
+
+        resp.send({
+            total: total,
+            valorParcela: valorParcela
+        });
+    } catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        })
+    }
+
+})
+
+//Usando parâmetro combinado com vetor de objeto
+
+endepoints.post('/loja/pedido/completo', (req, resp) => {
+    try {
+        if (!req.body.parcelas || isNaN(req.body.parcelas)) throw new Error('O parâmetro parcela está inválido');
+        if (!req.body.itens) throw new Error('O parâmetro itens está invállido');
+
+        let parcelas = req.body.parcelas;
+        let itens = req.body.itens;
+        let cupom = req.query.cupom;
+        let total = 0;
+
+        for (let produto of itens) {
+            total += produto.preco
+        }
+
+        if (parcelas > 1) {
+            let juros = total * 0.05;
+            total += juros;
+        }
+
+        let valorParcela = total / parcelas;
+
+        if (cupom == 'QUERO100') {
+            total -= 100;
+        }
+
+        resp.send({
+            total: total,
+            QuanridadeParcelas: parcelas,
+            valorParcela: valorParcela,
+            cupom: cupom
+        });
+    } catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        })
+    }
+})
+
+export default endepoints;
