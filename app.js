@@ -231,7 +231,7 @@ servidor.post('/loja/pedido/completo', (req, resp) => {
         total -= 100;
     }
 
-    resp.send({
+    resp.status(404).send({
         total: total,
         QuanridadeParcelas: parcelas,
         valorParcela: valorParcela,
