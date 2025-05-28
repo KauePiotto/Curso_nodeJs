@@ -1,8 +1,13 @@
 import { calcularTotal } from "../service/loja/PedidoCompletoService.js";
 import { calcularValorParcelas } from "../service/loja/PedidoCompletoService.js";
+
 import { ValidarPedidoCompleto } from "../validation/loja/pedidoCompletoValidation.js";
 
+import { logError } from "../utils/log.js/log.js";
+import { criarErro } from "../utils/log.js/erroUtils.js";
+
 import { Router } from "express";
+
 
 const endepoints = Router();
 
@@ -52,7 +57,6 @@ endepoints.post('/loja/pedido/completo', (req, resp) => {
         let cupom = req.query.cupom;
 
         let total = calcularTotal(parcelas, itens, cupom);
-
         let valorParcela = calcularValorParcelas(total, parcelas);
 
         resp.send({
@@ -61,10 +65,10 @@ endepoints.post('/loja/pedido/completo', (req, resp) => {
             valorParcela: valorParcela,
             cupom: cupom
         });
+
     } catch (err) {
-        resp.status(400).send({
-            erro: err.message
-        })
+        logError(err);
+        resp.status(400).send(criarErro)
     }
 })
 

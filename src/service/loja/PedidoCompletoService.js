@@ -1,4 +1,6 @@
 export function calcularTotal(parcelas, itens, cupom) {
+    let total = 0;
+
     for (let produto of itens) {
         total += produto.preco
     }
