@@ -24,9 +24,6 @@ servidor.get('/helloworld', (req, resp) => {
 
 //Usando direcionamento de rotas
 servidor.get('/mensagem/boasvindas', (req, resp) => {
-    let obj = {
-
-    }
     resp.send({
         mensagem: 'Olá, sejam bem-vindos e bem-vindas!'
     });
@@ -54,6 +51,13 @@ servidor.get('/mensagem/ocupado/recado', (req, resp) => {
 
 //Usando parâmetro de soma
 servidor.get('/calculadora/somar/:n1/:n2', (req, resp) => {
+    if (isNaN(req.params.n1) || isNaN(req.params.n2)) {
+        resp.status(400).send({
+            erro: 'Os parâmetros devem ser números'
+        })
+        return;
+    }
+
     let n1 = Number(req.params.n1);
     let n2 = Number(req.params.n2);
     let soma = n1 + n2;
@@ -69,6 +73,13 @@ servidor.get('/calculadora/somar/:n1/:n2', (req, resp) => {
 
 //Usando parâmetro de subtrair
 servidor.get('/calculadora/subtrair/:n1/:n2', (req, resp) => {
+    if (isNaN(req.params.n1) || isNaN(req.params.n2)) {
+        resp.status(400).send({
+            erro: 'Os parâmetros devem ser números'
+        })
+        return;
+    }
+
     let n1 = Number(req.params.n1);
     let n2 = Number(req.params.n2);
     let subtrair = n1 - n2;
@@ -84,6 +95,13 @@ servidor.get('/calculadora/subtrair/:n1/:n2', (req, resp) => {
 
 //Usando parâmetro de divisão
 servidor.get('/calculadora/divisao/:n1/:n2', (req, resp) => {
+    if (isNaN(req.params.n1) || isNaN(req.params.n2)) {
+        resp.status(400).send({
+            erro: 'Os parâmetros devem ser números'
+        })
+        return;
+    }
+
     let n1 = Number(req.params.n1);
     let n2 = Number(req.params.n2);
     let divir = n1 / n2;
@@ -99,6 +117,13 @@ servidor.get('/calculadora/divisao/:n1/:n2', (req, resp) => {
 
 //Usando parâmetro de Multiplicação
 servidor.get('/calculadora/multiplocacao/:n1/:n2', (req, resp) => {
+    if (isNaN(req.params.n1) || isNaN(req.params.n2)) {
+        resp.status(400).send({
+            erro: 'Os parâmetros devem ser números'
+        })
+        return;
+    }
+
     let n1 = Number(req.params.n1);
     let n2 = Number(req.params.n2);
     let multiplicacao = n1 * n2;
@@ -114,6 +139,13 @@ servidor.get('/calculadora/multiplocacao/:n1/:n2', (req, resp) => {
 
 //Usando parâmetro para saber se é par ou impar
 servidor.get('/calculadora/par-ou-impar/:n1/:n2', (req, resp) => {
+    if (isNaN(req.params.n1) || isNaN(req.params.n2)) {
+        resp.status(400).send({
+            erro: 'Os parâmetros devem ser números'
+        })
+        return;
+    }
+
     let n1 = Number(req.params.n1);
     let n2 = Number(req.params.n2);
     let soma = n1 / n2;
@@ -153,6 +185,13 @@ servidor.get('/calculadora/somar2', (req, resp) => {
 
 
 servidor.get('/mensagem/ola', (req, resp) => {
+    if (!req.query.nome) {
+        resp.status(400).send({
+            erro: 'Os parâmetros query (nome) é obrigatorio'
+        })
+        return;
+    }
+
     let pessoa = req.query.nome ?? 'você';
 
     resp.send({
@@ -192,54 +231,75 @@ servidor.post('/dobros', (req, resp) => {
 
 //Usando parâmetro combinado 
 servidor.post('/loja/pedido', (req, resp) => {
-    let total = req.body.total;
-    let parcelas = req.body.parcelas;
-    let cupom = req.query.cupom;
+    try {
+        if (!req.body.parcelas || isNaN(req.body.parcelas)) throw new Error('O parâmetro parcela está inválido.');
 
-    if (parcelas > 1) {
-        let juros = total * 0.05;
-        total += juros;
+        let total = req.body.total;
+        let parcelas = req.body.parcelas;
+        let cupom = req.query.cupom;
+
+        if (parcelas > 1) {
+            let juros = total * 0.05;
+            total += juros;
+        }
+
+        if (cupom == 'QUERO100') {
+            total -= 100;
+        } else {
+            if (!req.query.cupom) throw new Error('O cupom está inválido.')
+        }
+
+
+        let valorParcela = total / parcelas;
+
+        resp.send({
+            total: total,
+            valorParcela: valorParcela
+        });
+    } catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        })
     }
 
-    if (cupom == 'QUERO100') {
-        total -= 100;
-    }
-
-    let valorParcela = total / parcelas;
-
-    resp.send({
-        total: total,
-        valorParcela: valorParcela
-    });
 })
 
 //Usando parâmetro combinado com vetor de objeto
 
 servidor.post('/loja/pedido/completo', (req, resp) => {
-    let parcelas = req.body.parcelas;
-    let itens = req.body.itens;
-    let cupom = req.query.cupom;
-    let total = 0;
+    try {
+        if (!req.body.parcelas || isNaN(req.body.parcelas)) throw new Error('O parâmetro parcela está inválido');
+        if (!req.body.itens) throw new Error('O parâmetro itens está invállido');
 
-    for (let produto of itens) {
-        total += produto.preco
+        let parcelas = req.body.parcelas;
+        let itens = req.body.itens;
+        let cupom = req.query.cupom;
+        let total = 0;
+
+        for (let produto of itens) {
+            total += produto.preco
+        }
+
+        if (parcelas > 1) {
+            let juros = total * 0.05;
+            total += juros;
+        }
+
+        let valorParcela = total / parcelas;
+
+        if (cupom == 'QUERO100') {
+            total -= 100;
+        }
+
+        resp.send({
+            total: total,
+            QuanridadeParcelas: parcelas,
+            valorParcela: valorParcela,
+            cupom: cupom
+        });
+    } catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        })
     }
-
-    if (parcelas > 1) {
-        let juros = total * 0.05;
-        total += juros;
-    }
-
-    let valorParcela = total / parcelas;
-
-    if (cupom == 'QUERO100') {
-        total -= 100;
-    }
-
-    resp.status(404).send({
-        total: total,
-        QuanridadeParcelas: parcelas,
-        valorParcela: valorParcela,
-        cupom: cupom
-    });
 })
