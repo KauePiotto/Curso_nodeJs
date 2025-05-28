@@ -3,9 +3,6 @@ import { calcularValorParcelas } from "../service/loja/PedidoCompletoService.js"
 
 import { ValidarPedidoCompleto } from "../validation/loja/pedidoCompletoValidation.js";
 
-import { logError } from "../utils/log.js/log.js";
-import { criarErro } from "../utils/log.js/erroUtils.js";
-
 import { Router } from "express";
 
 
@@ -68,7 +65,7 @@ endepoints.post('/loja/pedido/completo', (req, resp) => {
 
     } catch (err) {
         logError(err);
-        resp.status(400).send(criarErro)
+        resp.status(400).send(criarErro(err))
     }
 })
 
