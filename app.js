@@ -1,6 +1,11 @@
 import express from "express";
 
+import cors from 'cors';
+
 const servidor = express();
+
+//Permitindo o uso do CORS
+servidor.use(cors());
 
 //Permite usar parâmetros de corpo na minha aplição
 servidor.use(express.json());
