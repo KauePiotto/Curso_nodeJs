@@ -1,3 +1,6 @@
+import { calcularTotal } from "../service/loja/PedidoCompletoService.js";
+import { calcularValorParcelas } from "../service/loja/PedidoCompletoService.js";
+
 import { Router } from "express";
 
 const endepoints = Router();
@@ -47,22 +50,10 @@ endepoints.post('/loja/pedido/completo', (req, resp) => {
         let parcelas = req.body.parcelas;
         let itens = req.body.itens;
         let cupom = req.query.cupom;
-        let total = 0;
 
-        for (let produto of itens) {
-            total += produto.preco
-        }
+        let total = calcularTotal(parcelas, itens, cupom);
 
-        if (parcelas > 1) {
-            let juros = total * 0.05;
-            total += juros;
-        }
-
-        let valorParcela = total / parcelas;
-
-        if (cupom == 'QUERO100') {
-            total -= 100;
-        }
+        let valorParcela = calcularValorParcelas(total, parcelas);
 
         resp.send({
             total: total,

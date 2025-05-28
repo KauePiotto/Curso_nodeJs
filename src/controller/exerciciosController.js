@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+import { calcularMedia } from "../service/exercicios/mediaService.js";
+
 const endepoints = Router();
 
 //Usando parâmetro de corpo
@@ -8,7 +10,7 @@ endepoints.post('/media', (req, resp) => {
     let n2 = req.body.nota2;
     let n3 = req.body.nota3;
 
-    let media = (n1 + n2 + n3) / 3;
+    let media = calcularMedia(n1,n2,n3);
 
     resp.send({
         media: media
