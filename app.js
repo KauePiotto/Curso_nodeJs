@@ -1,6 +1,9 @@
-import express, { request, response } from "express";
+import express from "express";
 
 const servidor = express();
+
+//Permite usar parâmetros de corpo na minha aplição
+servidor.use(express.json());
 
 //Porta da API
 servidor.listen(
@@ -99,3 +102,69 @@ servidor.get('/mensagem/ola', (req, resp) => {
     resp.send('Olá ' + pessoa);
 })
 
+//Usando parâmetro de corpo
+
+servidor.post('/media', (req, resp) => {
+    let n1 = req.body.nota1;
+    let n2 = req.body.nota2;
+    let n3 = req.body.nota3;
+
+    let media = (n1 + n2 + n3) / 3;
+
+    resp.send('A média é ' + media);
+})
+
+//Usando parâmetro de corpo com vetor
+
+servidor.post('/dobros', (req, resp) => {
+    let nums = req.body.numeros;
+
+    let nums2 = [];
+    for (let i = 0; i < nums.length; i++) {
+        nums2[i] = nums[i] * 2;
+    }
+
+    resp.send('Os dobros dos números são ' + nums2);
+})
+
+//Usando parâmetro combinado 
+servidor.post('/loja/pedido', (req, resp) => {
+    let total = req.body.total;
+    let parcelas = req.body.parcelas;
+    let cupom = req.query.cupom;
+
+    if (parcelas > 1) {
+        let juros = total * 0.05;
+        total += juros;
+    }
+
+    if (cupom == 'QUERO100') {
+        total -= 100;
+    }
+
+    resp.send('O total do pedido ficou em R$ ' + total);
+})
+
+//Usando parâmetro combinado com vetor de objeto
+
+servidor.post('/loja/pedido/completo', (req, resp) => {
+    let parcelas = req.body.parcelas;
+    let itens = req.body.itens;
+    let cupom = req.query.cupom;
+    let total = 0;
+
+    for (let produto of itens) {
+        total += produto.preco
+    }
+
+    if (parcelas > 1) {
+        let juros = total * 0.05;
+        total += juros;
+    }
+
+    if (cupom == 'QUERO100') {
+        total -= 100;
+    }
+
+    resp.send('O total a pagar é R$ '+ total);
+})
