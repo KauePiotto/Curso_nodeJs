@@ -1,3 +1,4 @@
+import 'dotenv/config.js';
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
@@ -12,14 +13,16 @@ servidor.use(express.json());
 
 //Variavel que  aponta para onde os arquivos que foram recebidos vão ser armazenados
 let uploadPerfil = multer({ dest: './storage/perfil' })
+
 //Usado para liberar a pasta storage/perfil para carregar a foto na Web
 servidor.use('/storage/perfil', express.static('./storage/perfil'))
 servidor.use('/storage/album', express.static('./storage/album'))
 
 //Porta da API
+const PORTA = process.env.PORTA;
+
 servidor.listen(
-    5001,
-    () => console.log('----> API subiu com sucesso na porta 5001!'));
+    PORTA, () => console.log(`----> API subiu com sucesso na porta ${PORTA}!`));
 
 //Código do endpoint   
 servidor.get('/helloworld', (req, resp) => {
@@ -56,6 +59,7 @@ servidor.get('/mensagem/ocupado/recado', (req, resp) => {
 //Usando parâmetro
 
 //Usando parâmetro de soma
+//Usando o CORS para consumir a API em um outro HTML
 servidor.get('/calculadora/somar/:n1/:n2', (req, resp) => {
     if (isNaN(req.params.n1) || isNaN(req.params.n2)) {
         resp.status(400).send({
@@ -176,7 +180,6 @@ servidor.get('/calculadora/par-ou-impar/:n1/:n2', (req, resp) => {
 })
 
 //Usando parâmetro de query
-
 //Usando parâmetro de somar pelo query
 //No query criar a rota e coloca o parâmetro na hora de usar o get usando ?n1=0&n2=0 n1 e n2 são os nomes da variaveis
 servidor.get('/calculadora/somar2', (req, resp) => {
@@ -206,7 +209,6 @@ servidor.get('/mensagem/ola', (req, resp) => {
 })
 
 //Usando parâmetro de corpo
-
 servidor.post('/media', (req, resp) => {
     let n1 = req.body.nota1;
     let n2 = req.body.nota2;
@@ -220,7 +222,6 @@ servidor.post('/media', (req, resp) => {
 })
 
 //Usando parâmetro de corpo com vetor
-
 servidor.post('/dobros', (req, resp) => {
     let nums = req.body.numeros;
 
